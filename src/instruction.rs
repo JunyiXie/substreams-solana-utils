@@ -147,16 +147,36 @@ impl<'a> LogStack<'a> {
         }
 
         loop {
+            // Check if there are more logs available
+            if logs.peek().is_none() {
+                // No more logs available, return what we have collected so far
+                return self.stack.pop();
+            }
+            
+                         // Peek at the next log to check if it's an invoke before consuming it
+             if logs.peek().map(|log| log.is_invoke()).unwrap_or(false) {
+                 // Found an unexpected invoke log, don't consume it and return current stack
+                 if let Some(peeked_log) = logs.peek() {
+                     eprintln!("Warning: Encountered unexpected invoke log '{}' while closing instruction stack for program_id: {:?}", peeked_log, program_id);
+                 }
+                 return self.stack.pop();
+             }
+            
             let log = logs.next().unwrap();
 
             if log.is_truncated() {
                 self.is_truncated = true;
                 return None;
-            } else if log.is_invoke() {
-                panic!("Unexpected invoke log");
             }
 
             let is_success = log.is_success();
+            
+            // Ensure we have a stack to work with
+            if self.stack.is_empty() {
+                eprintln!("Warning: Attempting to add log to empty stack for program_id: {:?}", program_id);
+                return None;
+            }
+            
             self.stack.last_mut().unwrap().push(log);
             if is_success {
                 return self.stack.pop()
