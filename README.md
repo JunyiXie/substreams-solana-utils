@@ -8,5 +8,5 @@ To include `substreams-solana-utils` in your project, add the following to your 
 
 ```toml
 [dependencies]
-substreams-solana-utils = { git = "https://github.com/0xpapercut/substreams-solana-utils", tag = "v2.0.2" }
+substreams-solana-utils = { git = "https://github.com/0xpapercut/substreams-solana-utils", tag = "v2.0.3" }
 ```
