@@ -627,7 +627,7 @@ dependencies = [
 
 [[package]]
 name = "substreams-solana-utils"
-version = "0.1.4"
+version = "2.0.0"
 dependencies = [
  "anyhow",
  "base64",
