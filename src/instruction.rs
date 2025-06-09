@@ -121,6 +121,12 @@ impl<'a> LogStack<'a> {
             return;
         }
         loop {
+            // Check if there are more logs available
+            if logs.peek().is_none() {
+                eprintln!("Warning: No more logs available while opening instruction stack for program_id: {:?}", program_id);
+                break;
+            }
+            
             let log = logs.next().unwrap();
 
             if log.is_truncated() {
@@ -130,7 +136,14 @@ impl<'a> LogStack<'a> {
                 self.stack.push(vec![log]);
                 break;
             } else {
-                self.stack.last_mut().unwrap().push(log);
+                // Ensure we have a stack to work with
+                if self.stack.is_empty() {
+                    eprintln!("Warning: Attempting to add log to empty stack in open() for program_id: {:?}", program_id);
+                    // Create a new stack entry for this log
+                    self.stack.push(vec![log]);
+                } else {
+                    self.stack.last_mut().unwrap().push(log);
+                }
             }
         }
     }
